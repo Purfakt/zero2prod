@@ -11,7 +11,7 @@ async fn main() -> Result<(), std::io::Error> {
 
     let configuration = get_configuration().expect("Failed to read configuration.");
 
-    let _ = Application::build(configuration)
+    Application::build(configuration)
         .await?
         .run_until_stopped()
         .await?;
