@@ -23,7 +23,7 @@ reqwest = { version = "0.11", default-features = false, features = [
     "rustls-tls",
 ] }
 secrecy = { version = "0.8", features = ["serde"] }
-serde = "1.0.115"
+serde = "1"
 serde-aux = "4"
 sqlx = { version = "0.6", default-features = false, features = [
     "runtime-actix-rustls",

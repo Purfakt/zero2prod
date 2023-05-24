@@ -1,8 +1,7 @@
 use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
-use wiremock::matchers::{method, path};
-use wiremock::{Mock, MockServer, ResponseTemplate};
+use wiremock::MockServer;
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
 use zero2prod::startup::{get_connection_pool, Application};
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
@@ -53,14 +52,13 @@ impl TestApp {
             assert_eq!(links.len(), 1);
             let raw_link = links[0].as_str().to_owned();
             let mut confirmation_link = reqwest::Url::parse(&raw_link).unwrap();
-            // Let's make sure we don't call random APIs on the web
             assert_eq!(confirmation_link.host_str().unwrap(), "127.0.0.1");
             confirmation_link.set_port(Some(self.port)).unwrap();
             confirmation_link
         };
 
-        let html = get_link(&body["HtmlBody"].as_str().unwrap());
-        let plain_text = get_link(&body["TextBody"].as_str().unwrap());
+        let html = get_link(body["HtmlBody"].as_str().unwrap());
+        let plain_text = get_link(body["TextBody"].as_str().unwrap());
         ConfirmationLinks { html, plain_text }
     }
 }
@@ -115,19 +113,4 @@ async fn configure_database(configuration: &DatabaseSettings) -> PgPool {
         .expect("Failed to migrate database.");
 
     connection_pool
-}
-
-#[tokio::test]
-async fn subscribe_sends_a_confirmation_email_for_valid_data() {
-    let app = spawn_app().await;
-    let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
-
-    Mock::given(path("/campaigns/1/actions/test"))
-        .and(method("POST"))
-        .respond_with(ResponseTemplate::new(200))
-        .expect(1)
-        .mount(&app.email_server)
-        .await;
-
-    app.post_subscriptions(body.into()).await;
 }
