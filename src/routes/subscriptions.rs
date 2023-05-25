@@ -23,7 +23,7 @@ impl Display for StoreTokenError {
 
 impl std::error::Error for StoreTokenError {}
 
-fn error_chain_fmt(
+pub fn error_chain_fmt(
     e: &impl std::error::Error,
     f: &mut std::fmt::Formatter<'_>,
 ) -> std::fmt::Result {
@@ -35,6 +35,7 @@ fn error_chain_fmt(
     }
     Ok(())
 }
+
 impl Debug for StoreTokenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         error_chain_fmt(self, f)
@@ -147,7 +148,7 @@ pub async fn send_confirmation_email(
         confirmation_link
     );
     email_client
-        .send_email(new_subscriber.email, "Welcome", &html_body, &plain_body)
+        .send_email(&new_subscriber.email, "Welcome", &html_body, &plain_body)
         .await
 }
 
