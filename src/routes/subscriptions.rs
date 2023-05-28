@@ -90,12 +90,12 @@ impl TryFrom<FormData> for NewSubscriber {
     )
 )]
 pub async fn subscribe(
-    form: web::Form<FormData>,
+    web::Form(form): web::Form<FormData>,
     pool: web::Data<PgPool>,
     email_client: web::Data<EmailClient>,
     base_url: web::Data<ApplicationBaseUrl>,
 ) -> Result<HttpResponse, SubscribeError> {
-    let new_subscriber = form.0.try_into().map_err(SubscribeError::ValidationError)?;
+    let new_subscriber = form.try_into().map_err(SubscribeError::ValidationError)?;
     let mut transaction = pool
         .begin()
         .await
