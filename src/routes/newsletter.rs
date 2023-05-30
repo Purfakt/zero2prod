@@ -1,5 +1,5 @@
 use crate::authentication::{validate_credentials, AuthError, Credentials};
-use crate::domain::SubscriberEmail;
+use crate::domain::{Password, SubscriberEmail};
 use crate::email_client::EmailClient;
 use crate::routes::error_chain_fmt;
 use actix_web::http::header::{self, HeaderMap, HeaderValue};
@@ -7,7 +7,6 @@ use actix_web::http::StatusCode;
 use actix_web::{web, HttpRequest, HttpResponse, ResponseError};
 use anyhow::Context;
 use base64::Engine;
-use secrecy::Secret;
 use sqlx::PgPool;
 
 struct ConfirmedSubscriber {
@@ -135,7 +134,7 @@ fn basic_authentication(headers: &HeaderMap) -> Result<Credentials, anyhow::Erro
         .to_string();
     Ok(Credentials {
         username,
-        password: Secret::new(password),
+        password: Password::parse(password).map_err(|e| anyhow::anyhow!(e))?,
     })
 }
 

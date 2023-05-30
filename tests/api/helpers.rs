@@ -131,6 +131,10 @@ impl TestApp {
             .await
             .expect("Failed to execute request.")
     }
+
+    pub async fn get_change_password_html(&self) -> String {
+        self.get_change_password().await.text().await.unwrap()
+    }
 }
 
 pub fn assert_is_redirect_to(response: &reqwest::Response, location: &str) {
@@ -210,7 +214,7 @@ impl TestUser {
         .to_string();
         sqlx::query!(
             "INSERT INTO users (user_id, username, password_hash)
-    VALUES ($1, $2, $3)",
+            VALUES ($1, $2, $3)",
             self.user_id,
             self.username,
             password_hash,

@@ -1,11 +1,11 @@
 use actix_web::{error::InternalError, web, HttpResponse};
 use actix_web_flash_messages::FlashMessage;
 use reqwest::header::LOCATION;
-use secrecy::Secret;
 use sqlx::PgPool;
 
 use crate::{
     authentication::{validate_credentials, AuthError, Credentials},
+    domain::Password,
     routes::error_chain_fmt,
     session_state::TypedSession,
 };
@@ -13,7 +13,7 @@ use crate::{
 #[derive(serde::Deserialize)]
 pub struct FormData {
     username: String,
-    password: Secret<String>,
+    password: Password,
 }
 
 #[derive(thiserror::Error)]
