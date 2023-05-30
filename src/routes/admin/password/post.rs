@@ -16,7 +16,7 @@ pub struct FormData {
 }
 
 pub async fn change_password(
-    form: web::Form<FormData>,
+    web::Form(form): web::Form<FormData>,
     pool: web::Data<PgPool>,
     user_id: web::ReqData<UserId>,
 ) -> Result<HttpResponse, actix_web::Error> {
@@ -34,7 +34,7 @@ pub async fn change_password(
 
     let credentials = Credentials {
         username,
-        password: form.0.current_password,
+        password: form.current_password,
     };
 
     if let Err(e) = validate_credentials(credentials, &pool).await {
@@ -47,7 +47,7 @@ pub async fn change_password(
         };
     };
 
-    crate::authentication::change_password(*user_id, form.0.new_password, &pool)
+    crate::authentication::change_password(*user_id, form.new_password, &pool)
         .await
         .map_err(e500)?;
     FlashMessage::error("Your password has been changed.").send();
